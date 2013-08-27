@@ -30,31 +30,42 @@ def loadWords(fileName):
 
 class Candidate(object):
 
-    def __init__(self, index=0, part=''):
+    def __init__(self, index=0, part='', cost=cost.JOIN):
         self.index = index
         self.part = list(part)
-        self.cost = cost.JOIN
+        self.cost = cost
 
     def __str__(self):
         return "index:" + str(self.index) + " STR:" + "".join(self.part)\
             + " Cost: " + str(self.cost)
 
+cTimes = 0
+sTimes = 0
+
 
 def solve(candidate):
 
+    global sTimes, cTimes
+
     if str(candidate.part[candidate.index:]) in cache:
+        cTimes += 1
         return cache[str(candidate.part[candidate.index:])]
 
     if candidate.index >= len(candidate.part):
         return Candidate(index=len(candidate.part))
 
+    sTimes += 1
     solutionList = list()
 
     # case 1 join previous string
     '''print "Solving for join " + str(Candidate(index=candidate.index + 1,
                                    part=candidate.part))'''
-    joinSolution = solve(Candidate(index=candidate.index + 1,
-                                   part=candidate.part))
+    if candidate.index > maxWordLength:
+        joinSolution = Candidate(index=candidate.index, part=candidate.part,
+                                 cost=cost.MAX)
+    else:
+        joinSolution = solve(Candidate(index=candidate.index + 1,
+                                       part=candidate.part))
     if joinSolution.index > candidate.index:
         candidateWord = candidate.part[:candidate.index + 1]
         if ("".join(sorted(candidateWord)) in wordDict)\
@@ -112,6 +123,7 @@ def solve(candidate):
 if __name__ == "__main__":
     loadWords(sys.argv[1])
     #print str(wordDict)
-    print str(solve(Candidate(part="etaelehoyrnrsweeneiornvtsdelreiolrertsrhotruongpmghwsihlxtde")))
-    for c in cache.keys():
-        print str(c) + ' : ' + str(cache[c])
+    print str(solve(Candidate(part="cesaleomrnuheollx")))
+    print "CTimes:" + str(cTimes) + " sTimes:" + str(sTimes)
+    #for c in cache.keys():
+    #    print str(c) + ' : ' + str(cache[c])
