@@ -59,7 +59,7 @@ def solve(candidate):
         candidateWord = candidate.part[:candidate.index + 1]
         if ("".join(sorted(candidateWord)) in wordDict)\
                                 and len(candidateWord) >= 4:
-            joinSolution.index = 0
+            joinSolution.index = candidate.index
             properWord = wordDict["".join(sorted(candidateWord))]
             properWord = properWord[0].upper() + properWord[1:].lower()
             joinSolution.part[:candidate.index + 1] = properWord
