@@ -12,6 +12,7 @@ def enum(**enums):
 wordDict = dict()
 cost = enum(SKIP=10, JOIN=0, MAX=sys.maxint)
 SKIP_CHAR = "-"
+MIN_LEN = 4
 
 cache = dict()
 
@@ -31,18 +32,21 @@ class Candidate(object):
         self.part = list(part)
         self.cost = cost
 
-    def __str__(self):
-        return "index:" + str(self.index) + " STR:" + "".join(self.part)\
-            + " Cost: " + str(self.cost)
-
 
 def c(candidate):
     return str(candidate.index) + " " + "".join(candidate.part)
 
 
-def solve(candidate):
+def replaceWithWord(candidate, word, rng):
+    if ("".join(sorted(word)) in wordDict) and len(word) >= MIN_LEN:
+            properWord = wordDict["".join(sorted(word))]
+            properWord = properWord[0].upper() + properWord[1:].lower()
+            candidate.part[rng[0]:rng[1]] = properWord
+            return True
+    return False
 
-    global sTimes, cTimes
+
+def solve(candidate):
 
     if c(candidate) in cache:
         cached = cache[c(candidate)]
@@ -56,13 +60,9 @@ def solve(candidate):
     joinSolution = solve(Candidate(index=candidate.index + 1,
                                        part=candidate.part))
     if joinSolution.index > candidate.index:
-        candidateWord = candidate.part[:candidate.index + 1]
-        if ("".join(sorted(candidateWord)) in wordDict)\
-                                and len(candidateWord) >= 4:
-            joinSolution.index = candidate.index
-            properWord = wordDict["".join(sorted(candidateWord))]
-            properWord = properWord[0].upper() + properWord[1:].lower()
-            joinSolution.part[:candidate.index + 1] = properWord
+        if replaceWithWord(joinSolution, candidate.part[:candidate.index + 1],
+                           (0, candidate.index + 1)):
+            joinSolution.index = 0
         else:
             joinSolution.cost = cost.MAX
 
@@ -74,18 +74,14 @@ def solve(candidate):
     skipSolution.cost += cost.SKIP
     skipSolution.index = candidate.index
 
-    newWordSolution = solve(Candidate(index=4,
+    newWordSolution = solve(Candidate(index=MIN_LEN,
                                       part=candidate.part[candidate.index:]))
     # Make sure whatever is left is a valid word
     if newWordSolution.index > 0:
-        candidateWord = candidate.part[candidate.index:candidate.index
-                                       + newWordSolution.index]
-        if ("".join(sorted(candidateWord)) in wordDict)\
-                                and len(candidateWord) >= 4:
-            properWord = wordDict["".join(sorted(candidateWord))]
-            properWord = properWord[0].upper() + properWord[1:].lower()
-            newWordSolution.part[0:newWordSolution.index] = properWord
-        else:
+        if not replaceWithWord(newWordSolution,
+                           candidate.part[candidate.index:candidate.index +\
+                                          newWordSolution.index],
+                           (0, newWordSolution.index)):
             newWordSolution.cost = cost.MAX
     newWordSolution.index = candidate.index
     newWordSolution.part = candidate.part[0:candidate.index] +\
@@ -100,14 +96,12 @@ def solve(candidate):
 
 if __name__ == "__main__":
     loadWords(sys.argv[1])
-    final = solve(Candidate(part="etaelehoyrnrsweeneiornvtsdelreiolrertsrhotruongpmghwsihlxtde"
-                            "elaneeetldosheeralithtndareluttelderrocltaeiwrtodeoeyladfswp"
-                            "sremeucraddfvrntaiansudynaeytnaidthioicheegblyoeielsvvneolii"
-                            "wudveieuaoaodptetpurrdeieecnohasapiwdoehltflsbohlamthioeosistssbstwe"
-                             ))
-    print "".join(final.part)
+    runString = "etaelehoyrnrsweeneiornvtsdelreiolrertsrhotruongpmghwsihlxtde"\
+                "elaneeetldosheeralithtndareluttelderrocltaeiwrtodeoeyladfswp"\
+                "sremeucraddfvrntaiansudynaeytnaidthioicheegblyoeielsvvneolii"\
+                "wudveieuaoaodptetpurrdeieecnohasapiwdoehltflsbohlamthioeosis"\
+                "tssbstwe"
+    solution = solve(Candidate(part=runString))
+    print "".join(solution.part)
     print str(reduce(lambda s, ch: s + 1 if ch == SKIP_CHAR else s,
-                     final.part, 0)) + " skips"
-    #print "CTimes:" + str(cTimes) + " sTimes:" + str(sTimes)
-    #for c in cache.keys():
-    #    print str(c) + ' : ' + str(cache[c])
+                     solution.part, 0)) + " skips"
