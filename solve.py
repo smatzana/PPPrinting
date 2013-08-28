@@ -43,28 +43,29 @@ cTimes = 0
 sTimes = 0
 
 
+def c(candidate):
+    return str(candidate.index) + " " + "".join(candidate.part)
+
+
 def solve(candidate):
 
     global sTimes, cTimes
 
-    if str(candidate.part[candidate.index:]) in cache:
+    if c(candidate) in cache:
         cTimes += 1
-        return cache[str(candidate.part[candidate.index:])]
+        cached = cache[c(candidate)]
+        return Candidate(index=cached.index, part=cached.part, cost=cached.cost)
 
     if candidate.index >= len(candidate.part):
         return Candidate(index=len(candidate.part))
 
     sTimes += 1
     solutionList = list()
-
+    
     # case 1 join previous string
     '''print "Solving for join " + str(Candidate(index=candidate.index + 1,
                                    part=candidate.part))'''
-    if candidate.index > maxWordLength:
-        joinSolution = Candidate(index=candidate.index, part=candidate.part,
-                                 cost=cost.MAX)
-    else:
-        joinSolution = solve(Candidate(index=candidate.index + 1,
+    joinSolution = solve(Candidate(index=candidate.index + 1,
                                        part=candidate.part))
     if joinSolution.index > candidate.index:
         candidateWord = candidate.part[:candidate.index + 1]
@@ -74,6 +75,7 @@ def solve(candidate):
             joinSolution.index = 0
             properWord = wordDict["".join(sorted(candidateWord))]
             properWord = properWord[0].upper() + properWord[1:].lower()
+            #print "Proper:" + properWord
             joinSolution.part[:candidate.index + 1] = properWord
         else:
             joinSolution.cost = cost.MAX
@@ -99,8 +101,8 @@ def solve(candidate):
                                 and len(candidateWord) >= 4:
             properWord = wordDict["".join(sorted(candidateWord))]
             properWord = properWord[0].upper() + properWord[1:].lower()
-            newWordSolution.part[candidate.index:candidate.index
-                                       + newWordSolution.index] = properWord
+            #print "Proper:" + properWord
+            newWordSolution.part[0:newWordSolution.index] = properWord
         else:
             newWordSolution.cost = cost.MAX
     newWordSolution.index = candidate.index
@@ -117,13 +119,20 @@ def solve(candidate):
     if s == newWordSolution:
         pass
     #print " -> Cacheing for " + str(s.part[s.index:])
-    cache[str(s.part[s.index:])] = s
+    cache[c(candidate)] = Candidate(index=s.index, part=s.part, cost=s.cost)
+    #print c(candidate) + "=" + str(s)
     return s
 
 if __name__ == "__main__":
     loadWords(sys.argv[1])
     #print str(wordDict)
-    print str(solve(Candidate(part="cesaleomrnuheollx")))
+    print str(solve(Candidate(part=#"ehoyrnrsweeneiornv"
+                              #"etaelehoyrnrsweeneiornv"
+                              "etaelehoyrnrsweeneiornvtsdelreiolrertsrhotruongpmghwsihlxtde"
+                              "elaneeetldosheeralithtndareluttelderrocltaeiwrtodeoeyladfswp"
+                              "sremeucraddfvrntaiansudynaeytnaidthioicheegblyoeielsvvneolii"
+                              "wudveieuaoaodptetpurrdeieecnohasapiwdoehltflsbohlamthioeosistssbstwe"
+                             )))
     print "CTimes:" + str(cTimes) + " sTimes:" + str(sTimes)
     #for c in cache.keys():
     #    print str(c) + ' : ' + str(cache[c])
