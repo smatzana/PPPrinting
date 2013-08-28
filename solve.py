@@ -126,13 +126,13 @@ def solve(candidate):
 if __name__ == "__main__":
     loadWords(sys.argv[1])
     #print str(wordDict)
-    print str(solve(Candidate(part=#"ehoyrnrsweeneiornv"
-                              #"etaelehoyrnrsweeneiornv"
-                              "etaelehoyrnrsweeneiornvtsdelreiolrertsrhotruongpmghwsihlxtde"
-                              "elaneeetldosheeralithtndareluttelderrocltaeiwrtodeoeyladfswp"
-                              "sremeucraddfvrntaiansudynaeytnaidthioicheegblyoeielsvvneolii"
-                              "wudveieuaoaodptetpurrdeieecnohasapiwdoehltflsbohlamthioeosistssbstwe"
-                             )))
-    print "CTimes:" + str(cTimes) + " sTimes:" + str(sTimes)
+    final = solve(Candidate(part="etaelehoyrnrsweeneiornvtsdelreiolrertsrhotruongpmghwsihlxtde"
+                            "elaneeetldosheeralithtndareluttelderrocltaeiwrtodeoeyladfswp"
+                            "sremeucraddfvrntaiansudynaeytnaidthioicheegblyoeielsvvneolii"
+                            "wudveieuaoaodptetpurrdeieecnohasapiwdoehltflsbohlamthioeosistssbstwe"
+                             ))
+    print "".join(final.part)
+    print str(reduce(lambda s,ch: s+1 if ch == SKIP_CHAR else s, final.part, 0)) + " skips"
+    #print "CTimes:" + str(cTimes) + " sTimes:" + str(sTimes)
     #for c in cache.keys():
     #    print str(c) + ' : ' + str(cache[c])
